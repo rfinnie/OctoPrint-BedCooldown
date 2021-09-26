@@ -1,0 +1,4 @@
+include README.md
+include COPYING.md
+recursive-include octoprint_bedcooldown/templates *
+recursive-include octoprint_bedcooldown/translations *
