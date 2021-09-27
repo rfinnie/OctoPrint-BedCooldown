@@ -9,6 +9,7 @@ from octoprint.events import Events
 class BedCooldown(
     octoprint.plugin.EventHandlerPlugin,
     octoprint.plugin.SettingsPlugin,
+    octoprint.plugin.AssetPlugin,
     octoprint.plugin.TemplatePlugin,
 ):
 
