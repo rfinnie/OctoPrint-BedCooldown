@@ -79,7 +79,7 @@ class BedCooldown(
                 "repo": "OctoPrint-BedCooldown",
                 "current": self._plugin_version,
                 # update method: pip
-                "pip": "https://github.com/rfinnie/OctoPrint-BedCooldown/archive/v{target_version}.zip",
+                "pip": "https://github.com/rfinnie/OctoPrint-BedCooldown/archive/{target_version}.zip",
             }
         }
 
