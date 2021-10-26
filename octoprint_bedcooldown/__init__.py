@@ -18,7 +18,17 @@ class BedCooldown(
     ##~~ EventHandlerPlugin mixin
 
     def on_event(self, event, payload):
+        if event not in (
+            Events.PRINT_STARTED,
+            Events.PRINT_DONE,
+            Events.PRINT_FAILED,
+            Events.PRINT_CANCELLED,
+        ):
+            return
+        self._logger.debug("Handling {} event".format(event))
+
         if not self._settings.get_boolean(["enabled"]):
+            self._logger.debug("Plugin is not enabled")
             return
 
         if event == Events.PRINT_STARTED:
@@ -28,17 +38,24 @@ class BedCooldown(
                     self._settings.get_int(["completion"]),
                 )
             )
+            self._logger.debug("Scheduling RepeatedTimer for 30 seconds")
             self._bedcooldown_timer = octoprint.util.RepeatedTimer(
                 30, self._bedcooldown_timer_triggered
             )
             self._bedcooldown_timer.start()
         elif event in (Events.PRINT_DONE, Events.PRINT_FAILED, Events.PRINT_CANCELLED):
             if self._bedcooldown_timer is not None:
+                self._logger.debug(
+                    "Print ended via {} event, cancelling timer".format(event)
+                )
                 self._bedcooldown_timer.cancel()
                 self._bedcooldown_timer = None
 
     def _bedcooldown_timer_triggered(self):
         if not self._printer.is_printing():
+            self._logger.warning(
+                "_bedcooldown_timer_triggered triggered but not printing? This shouldn't happen."
+            )
             return
         current_data = self._printer.get_current_data()
         if (
@@ -52,6 +69,16 @@ class BedCooldown(
             self._printer.commands("M140 S0")
             self._bedcooldown_timer.cancel()
             self._bedcooldown_timer = None
+        else:
+            self._logger.debug(
+                "({}/{}, {}%) is not yet within trigger threshold ({}, {}%)".format(
+                    current_data["progress"]["printTimeLeft"],
+                    current_data["progress"]["printTimeLeftOrigin"],
+                    current_data["progress"]["completion"],
+                    self._settings.get_int(["time_left"]),
+                    self._settings.get_int(["completion"]),
+                )
+            )
 
     ##~~ SettingsPlugin mixin
 
