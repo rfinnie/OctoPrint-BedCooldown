@@ -52,6 +52,9 @@ class BedCooldown(
                 self._bedcooldown_timer = None
 
     def _bedcooldown_timer_triggered(self):
+        if not self._settings.get_boolean(["enabled"]):
+            self._logger.debug("Plugin was disabled while print was in progress")
+            return
         if not self._printer.is_printing():
             self._logger.warning(
                 "_bedcooldown_timer_triggered triggered but not printing? This shouldn't happen."
