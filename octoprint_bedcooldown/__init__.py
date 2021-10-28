@@ -58,32 +58,51 @@ class BedCooldown(
             )
             return
         current_data = self._printer.get_current_data()
-        if (
-            current_data["progress"]["printTimeLeft"]
-            <= self._settings.get_int(["time_left"])
-        ) and (
-            current_data["progress"]["completion"]
-            >= self._settings.get_int(["completion"])
-        ):
+        time_elapsed = current_data["progress"]["printTime"]
+        time_left = current_data["progress"]["printTimeLeft"]
+        time_left_origin = current_data["progress"]["printTimeLeftOrigin"]
+        completion_time = (float(time_elapsed) / (time_elapsed + time_left)) * 100.0
+        completion_gcode = current_data["progress"]["completion"]
+        settings_time_left = self._settings.get_int(["time_left"])
+        settings_completion = self._settings.get_int(["completion"])
+        settings_completion_use_gcode = self._settings.get_boolean(
+            ["completion_use_gcode"]
+        )
+        if settings_completion_use_gcode:
+            completion = completion_gcode
+            completion_type = "gcode"
+        else:
+            completion = completion_time
+            completion_type = "time"
+        self._logger.debug(
+            (
+                "Time: {time_elapsed} elapsed, {time_left} left (via {time_left_origin}). "
+                "Completion: {completion_time} time, {completion_gcode} gcode (using {completion_type}). "
+                "Threshold: {time_left}s/{settings_time_left}s, {completion}%/{settings_completion}%".format(
+                    time_elapsed=time_elapsed,
+                    time_left=time_left,
+                    time_left_origin=time_left_origin,
+                    completion_time=completion_time,
+                    completion_gcode=completion_gcode,
+                    completion_type=completion_type,
+                    settings_time_left=settings_time_left,
+                    completion=completion,
+                    settings_completion=settings_completion,
+                )
+            )
+        )
+        if (time_left <= settings_time_left) and (completion >= settings_completion):
             self._logger.info("Bed cooldown triggered, turning off bed heater")
             self._printer.commands("M140 S0")
             self._bedcooldown_timer.cancel()
             self._bedcooldown_timer = None
-        else:
-            self._logger.debug(
-                "({}/{}, {}%) is not yet within trigger threshold ({}, {}%)".format(
-                    current_data["progress"]["printTimeLeft"],
-                    current_data["progress"]["printTimeLeftOrigin"],
-                    current_data["progress"]["completion"],
-                    self._settings.get_int(["time_left"]),
-                    self._settings.get_int(["completion"]),
-                )
-            )
 
     ##~~ SettingsPlugin mixin
 
     def get_settings_defaults(self):
-        return dict(enabled=True, time_left=300, completion=90)
+        return dict(
+            enabled=True, time_left=300, completion=90, completion_use_gcode=False
+        )
 
     ##~~ TemplatePlugin mixin
 
