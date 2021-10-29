@@ -27,17 +27,16 @@ class BedCooldown(
             return
         self._logger.debug("Handling {} event".format(event))
 
-        if not self._settings.get_boolean(["enabled"]):
-            self._logger.debug("Plugin is not enabled")
-            return
-
         if event == Events.PRINT_STARTED:
             self._logger.info(
-                "Bed cooldown will be triggered when time left is <= {}s and completion is >= {}%".format(
+                "Bed cooldown trigger is configured for when time left is <= {}s and completion is >= {}%".format(
                     self._settings.get_int(["time_left"]),
                     self._settings.get_int(["completion"]),
                 )
             )
+            if not self._settings.get_boolean(["enabled"]):
+                self._logger.info("However, plugin is not currently enabled")
+
             self._logger.debug("Scheduling RepeatedTimer for 30 seconds")
             self._bedcooldown_timer = octoprint.util.RepeatedTimer(
                 30, self._bedcooldown_timer_triggered
@@ -53,8 +52,9 @@ class BedCooldown(
 
     def _bedcooldown_timer_triggered(self):
         if not self._settings.get_boolean(["enabled"]):
-            self._logger.debug("Plugin was disabled while print was in progress")
+            self._logger.debug("Plugin is not enabled")
             return
+
         if not self._printer.is_printing():
             self._logger.warning(
                 "_bedcooldown_timer_triggered triggered but not printing? This shouldn't happen."
@@ -95,7 +95,15 @@ class BedCooldown(
             )
         )
         if (time_left <= settings_time_left) and (completion >= settings_completion):
-            self._logger.info("Bed cooldown triggered, turning off bed heater")
+            self._logger.info(
+                (
+                    "Bed cooldown triggered (<= {settings_time_left}s, "
+                    ">= {settings_completion}%), turning off bed heater"
+                ).format(
+                    settings_time_left=settings_time_left,
+                    settings_completion=settings_completion,
+                )
+            )
             self._printer.commands("M140 S0")
             self._bedcooldown_timer.cancel()
             self._bedcooldown_timer = None
