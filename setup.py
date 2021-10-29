@@ -1,4 +1,16 @@
 # coding=utf-8
+from setuptools import setup
+
+try:
+    import octoprint_setuptools
+except Exception:
+    print(
+        "Could not import OctoPrint's setuptools, are you sure you are running that under "
+        "the same python installation that OctoPrint is installed under?"
+    )
+    import sys
+
+    sys.exit(-1)
 
 plugin_identifier = "bedcooldown"
 plugin_package = "octoprint_bedcooldown"
@@ -14,21 +26,6 @@ plugin_additional_data = []
 plugin_additional_packages = []
 plugin_ignored_packages = []
 additional_setup_parameters = {}
-
-########################################################################################################################
-
-from setuptools import setup
-
-try:
-    import octoprint_setuptools
-except:
-    print(
-        "Could not import OctoPrint's setuptools, are you sure you are running that under "
-        "the same python installation that OctoPrint is installed under?"
-    )
-    import sys
-
-    sys.exit(-1)
 
 setup_parameters = octoprint_setuptools.create_plugin_setup_parameters(
     identifier=plugin_identifier,

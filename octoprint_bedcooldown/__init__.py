@@ -15,7 +15,7 @@ class BedCooldown(
 
     _bedcooldown_timer = None
 
-    ##~~ EventHandlerPlugin mixin
+    # EventHandlerPlugin mixin
 
     def on_event(self, event, payload):
         if event not in (
@@ -108,19 +108,19 @@ class BedCooldown(
             self._bedcooldown_timer.cancel()
             self._bedcooldown_timer = None
 
-    ##~~ SettingsPlugin mixin
+    # SettingsPlugin mixin
 
     def get_settings_defaults(self):
         return dict(
             enabled=True, time_left=300, completion=90, completion_use_gcode=False
         )
 
-    ##~~ TemplatePlugin mixin
+    # TemplatePlugin mixin
 
     def get_template_configs(self):
         return [dict(type="settings", custom_bindings=False)]
 
-    ##~~ Softwareupdate hook
+    # Softwareupdate hook
 
     def get_update_information(self):
         # Define the configuration for your plugin to use with the Software Update
