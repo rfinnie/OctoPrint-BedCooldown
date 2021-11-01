@@ -1,43 +1,42 @@
 <h3>Bed Cooldown</h3>
 
-<div>
-    <p>The bed heater will be turned off during a print, when both conditions are met:</p>
-    <ul>
-        <li>The print time left is below the configured threshold</li>
-        <li>The print completion percentage is above the configured threshold</li>
-    </ul>
-    <p>The plugin may be enabled/disabled or the settings changed while a print is in progress.</p>
-    <p>Be sure to monitor your print, as turning off the bed heater could cause the print to come loose prior to completion.</p>
-</div>
-
-<hr>
-
 <form class="form-horizontal">
     <div class="control-group">
-        <label class="control-label">{{ _('Enabled') }}</label>
         <div class="controls">
-            <input type="checkbox" class="input-checkbox" data-bind="checked: settings.plugins.bedcooldown.enabled">
+            <label class="checkbox">
+                <input type="checkbox" class="input-checkbox" data-bind="checked: settings.plugins.bedcooldown.enabled">
+                {{ _('Enable bed cooldown') }}
+                <span class="help-block">The plugin may be enabled/disabled or the settings changed while a print is in progress.</span>
+            </label>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">{{ _('Print time left threshold') }}</label>
+        <label class="control-label">{{ _('Trigger thresholds') }}</label>
         <div class="controls">
-            <input type="number" class="input-mini text-right" data-bind="value: settings.plugins.bedcooldown.time_left" min="0">
-            <span class="add-on">seconds</span>
+            <div class="input-append">
+                <input type="number" class="input-mini text-right" data-bind="value: settings.plugins.bedcooldown.time_left" min="0">
+                <span class="add-on">s</span>
+            </div>
+            <span class="help-inline">{{ _('Print time left') }}</span>
+        </div>
+        <div class="controls">
+            <div class="input-append">
+                <input type="number" class="input-mini text-right" data-bind="value: settings.plugins.bedcooldown.completion" min="0" max="100">
+                <span class="add-on">%</span>
+            </div>
+            <span class="help-inline">{{ _('Print percentage complete') }}</span>
+            <span class="help-block">{{ _('Bed cooldown will be triggered when the print time left is below its threshold, and the print percentage complete is above its threshold.') }}</span>
+        </div>
+        <div class="controls">
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">{{ _('Print completion threshold') }}</label>
         <div class="controls">
-            <input type="number" class="input-mini text-right" data-bind="value: settings.plugins.bedcooldown.completion" min="0" max="100">
-            <span class="add-on">%</span>
+            <label class="checkbox">
+                <input type="checkbox" class="input-checkbox" data-bind="checked: settings.plugins.bedcooldown.completion_use_gcode">
+                {{ _('Use GCODE for completion threshold') }}
+               <span class="help-block">{{ _('If checked, the actual percentage of the print completed by GCODE will be used, instead of the default estimated percentage of the print completed by time.') }}</span>
+            </label>
         </div>
     </div>
-    <div class="control-group">
-        <label class="control-label">{{ _('Use GCODE for completion threshold') }}</label>
-        <div class="controls">
-            <input type="checkbox" class="input-checkbox" data-bind="checked: settings.plugins.bedcooldown.completion_use_gcode">
-        </div>
-    </div>
-    <div class="help-block">{{ _('If checked, the actual percentage of the print completed by GCODE will be used, instead of the default estimated percentage of the print completed by time.') }}</div>
 </form>
