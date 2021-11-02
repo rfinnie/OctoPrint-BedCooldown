@@ -25,13 +25,14 @@ class BedCooldown(
             Events.PRINT_CANCELLED,
         ):
             return
-        self._logger.debug("Handling {} event".format(event))
+        self._logger.debug("Handling {event} event".format(event=event))
 
         if event == Events.PRINT_STARTED:
             self._logger.info(
-                "Bed cooldown trigger is configured for when time left is <= {}s and completion is >= {}%".format(
-                    self._settings.get_int(["time_left"]),
-                    self._settings.get_int(["completion"]),
+                "Bed cooldown trigger is configured for when time left is <= {time_left}s "
+                "and completion is >= {completion:0.02f}%".format(
+                    time_left=self._settings.get_int(["time_left"]),
+                    completion=self._settings.get_int(["completion"]),
                 )
             )
             if not self._settings.get_boolean(["enabled"]):
@@ -45,7 +46,9 @@ class BedCooldown(
         elif event in (Events.PRINT_DONE, Events.PRINT_FAILED, Events.PRINT_CANCELLED):
             if self._bedcooldown_timer is not None:
                 self._logger.debug(
-                    "Print ended via {} event, cancelling timer".format(event)
+                    "Print ended via {event} event, cancelling timer".format(
+                        event=event
+                    )
                 )
                 self._bedcooldown_timer.cancel()
                 self._bedcooldown_timer = None
@@ -79,9 +82,11 @@ class BedCooldown(
             completion_type = "time"
         self._logger.debug(
             (
-                "Time: {time_elapsed} elapsed, {time_left} left (via {time_left_origin}). "
-                "Completion: {completion_time} time, {completion_gcode} gcode (using {completion_type}). "
-                "Threshold: {time_left}s/{settings_time_left}s, {completion}%/{settings_completion}%".format(
+                "Time: {time_elapsed}s elapsed, {time_left}s left (via {time_left_origin}). "
+                "Completion: {completion_time:0.02f}% time, "
+                "{completion_gcode:0.02f}% gcode (using {completion_type}). "
+                "Threshold: {time_left}s/{settings_time_left}s, "
+                "{completion:0.02f}%/{settings_completion:0.02f}%".format(
                     time_elapsed=time_elapsed,
                     time_left=time_left,
                     time_left_origin=time_left_origin,
@@ -98,7 +103,7 @@ class BedCooldown(
             self._logger.info(
                 (
                     "Bed cooldown triggered (<= {settings_time_left}s, "
-                    ">= {settings_completion}%), turning off bed heater"
+                    ">= {settings_completion:0.02f}%), turning off bed heater"
                 ).format(
                     settings_time_left=settings_time_left,
                     settings_completion=settings_completion,
