@@ -108,6 +108,16 @@ class BedCooldown(
             self._bedcooldown_timer.cancel()
             self._bedcooldown_timer = None
 
+            self._event_bus.fire(
+                Events.PLUGIN_BEDCOOLDOWN_COOLDOWN_TRIGGERED,
+                {
+                    "settings_completion": settings_completion,
+                    "settings_time_left": settings_time_left,
+                    "completion": completion,
+                    "time_left": time_left,
+                },
+            )
+
     # SettingsPlugin mixin
 
     def get_settings_defaults(self):
@@ -140,6 +150,11 @@ class BedCooldown(
             }
         }
 
+    # Events hook
+
+    def register_custom_events(self, *args, **kwargs):
+        return ["cooldown_triggered"]
+
 
 __plugin_name__ = "Bed Cooldown"
 __plugin_pythoncompat__ = ">=2.7,<4"  # python 2 and 3
@@ -151,5 +166,6 @@ def __plugin_load__():
 
     global __plugin_hooks__
     __plugin_hooks__ = {
-        "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
+        "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
+        "octoprint.events.register_custom_events": __plugin_implementation__.register_custom_events,
     }
