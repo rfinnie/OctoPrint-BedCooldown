@@ -15,7 +15,7 @@ except Exception:
 plugin_identifier = "bedcooldown"
 plugin_package = "octoprint_bedcooldown"
 plugin_name = "OctoPrint-BedCooldown"
-plugin_version = "0.3.0"
+plugin_version = "0.4.1"
 plugin_description = "Turns off the bed heater toward the end of a print"
 plugin_author = "Ryan Finnie"
 plugin_author_email = "ryan@finnie.org"
