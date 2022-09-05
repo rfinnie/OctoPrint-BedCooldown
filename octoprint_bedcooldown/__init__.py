@@ -1,4 +1,7 @@
-# coding=utf-8
+# SPDX-PackageSummary: OctoPrint-BedCooldown
+# SPDX-FileCopyrightText: Copyright (C) 2021-2022 Ryan Finnie
+# SPDX-License-Identifier: MPL-2.0
+
 from __future__ import absolute_import
 
 import octoprint.plugin

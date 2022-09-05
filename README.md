@@ -25,3 +25,11 @@ or manually using this URL:
 
 You may configure this plugin through OctoPrint's UI.
 It may be selectively disabled, and the time left and completion thresholds may be adjusted.
+
+## License
+
+Copyright (C) 2021-2022 [Ryan Finnie](https://www.finnie.org/)
+
+This Source Code Form is subject to the terms of the Mozilla Public License, v.
+2.0. If a copy of the MPL was not distributed with this file, You can obtain one
+at https://mozilla.org/MPL/2.0/.
