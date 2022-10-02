@@ -5,6 +5,7 @@
 from __future__ import absolute_import
 
 from datetime import timedelta
+import types
 
 import octoprint.plugin
 import octoprint.util
@@ -20,6 +21,16 @@ class BedCooldown(
 
     _bedcooldown_timer = None
 
+    def _get_plugin_settings(self):
+        return types.SimpleNamespace(
+            enabled=self._settings.get_boolean(["enabled"]),
+            temperature=self._settings.get_int(["temperature"]),
+            time_elapsed=timedelta(seconds=self._settings.get_int(["time_elapsed"])),
+            time_left=timedelta(seconds=self._settings.get_int(["time_left"])),
+            completion=(self._settings.get_int(["completion"]) / 100.0),
+            completion_use_gcode=self._settings.get_boolean(["completion_use_gcode"]),
+        )
+
     # EventHandlerPlugin mixin
 
     def on_event(self, event, payload):
@@ -32,24 +43,19 @@ class BedCooldown(
             return
         self._logger.debug("Handling {event} event".format(event=event))
 
+        settings = self._get_plugin_settings()
         if event == Events.PRINT_STARTED:
             self._logger.info(
                 "Bed cooldown trigger to {settings_temperature}C is configured for when "
                 "time elapsed is >= {settings_time_elapsed}, time left is <= {settings_time_left}, "
                 "and completion is >= {settings_completion:0.02%}".format(
-                    settings_temperature=self._settings.get_int(["temperature"]),
-                    settings_time_elapsed=timedelta(
-                        seconds=self._settings.get_int(["time_elapsed"])
-                    ),
-                    settings_time_left=timedelta(
-                        seconds=self._settings.get_int(["time_left"])
-                    ),
-                    settings_completion=(
-                        self._settings.get_int(["completion"]) / 100.0
-                    ),
+                    settings_temperature=settings.temperature,
+                    settings_time_elapsed=settings.time_elapsed,
+                    settings_time_left=settings.time_left,
+                    settings_completion=settings.completion,
                 )
             )
-            if not self._settings.get_boolean(["enabled"]):
+            if not settings.enabled:
                 self._logger.info("However, plugin is not currently enabled")
 
             self._logger.debug("Scheduling RepeatedTimer for 30 seconds")
@@ -68,7 +74,8 @@ class BedCooldown(
                 self._bedcooldown_timer = None
 
     def _bedcooldown_timer_triggered(self):
-        if not self._settings.get_boolean(["enabled"]):
+        settings = self._get_plugin_settings()
+        if not settings.enabled:
             self._logger.debug("Plugin is not enabled")
             return
 
@@ -83,16 +90,7 @@ class BedCooldown(
         time_left_origin = current_data["progress"]["printTimeLeftOrigin"]
         completion_time = time_elapsed / (time_elapsed + time_left)
         completion_gcode = current_data["progress"]["completion"] / 100.0
-        settings_temperature = self._settings.get_int(["temperature"])
-        settings_time_elapsed = timedelta(
-            seconds=self._settings.get_int(["time_elapsed"])
-        )
-        settings_time_left = timedelta(seconds=self._settings.get_int(["time_left"]))
-        settings_completion = self._settings.get_int(["completion"]) / 100.0
-        settings_completion_use_gcode = self._settings.get_boolean(
-            ["completion_use_gcode"]
-        )
-        if settings_completion_use_gcode:
+        if settings.completion_use_gcode:
             completion = completion_gcode
             completion_type = "gcode"
         else:
@@ -112,17 +110,17 @@ class BedCooldown(
                     completion_time=completion_time,
                     completion_gcode=completion_gcode,
                     completion_type=completion_type,
-                    settings_time_elapsed=settings_time_elapsed,
-                    settings_time_left=settings_time_left,
+                    settings_time_elapsed=settings.time_elapsed,
+                    settings_time_left=settings.time_left,
                     completion=completion,
-                    settings_completion=settings_completion,
+                    settings_completion=settings.completion,
                 )
             )
         )
         if (
-            (time_elapsed >= settings_time_elapsed)
-            and (time_left <= settings_time_left)
-            and (completion >= settings_completion)
+            (time_elapsed >= settings.time_elapsed)
+            and (time_left <= settings.time_left)
+            and (completion >= settings.completion)
         ):
             self._logger.info(
                 (
@@ -130,15 +128,15 @@ class BedCooldown(
                     "<= {settings_time_left} left, "
                     ">= {settings_completion:0.02%}), setting bed to {settings_temperature}C"
                 ).format(
-                    settings_time_elapsed=settings_time_elapsed,
-                    settings_time_left=settings_time_left,
-                    settings_completion=settings_completion,
-                    settings_temperature=settings_temperature,
+                    settings_time_elapsed=settings.time_elapsed,
+                    settings_time_left=settings.time_left,
+                    settings_completion=settings.completion,
+                    settings_temperature=settings.temperature,
                 )
             )
             self._printer.commands(
                 "M140 S{settings_temperature:.0f}".format(
-                    settings_temperature=settings_temperature
+                    settings_temperature=settings.temperature
                 )
             )
             self._bedcooldown_timer.cancel()
@@ -147,10 +145,7 @@ class BedCooldown(
             self._event_bus.fire(
                 Events.PLUGIN_BEDCOOLDOWN_COOLDOWN_TRIGGERED,
                 {
-                    "settings_completion": settings_completion,
-                    "settings_time_elapsed": settings_time_elapsed,
-                    "settings_time_left": settings_time_left,
-                    "settings_temperature": settings_temperature,
+                    "settings": settings,
                     "completion": completion,
                     "time_elapsed": time_elapsed,
                     "time_left": time_left,
