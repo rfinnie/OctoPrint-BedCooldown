@@ -14,18 +14,25 @@
         <label class="control-label">{{ _('Trigger thresholds') }}</label>
         <div class="controls">
             <div class="input-append">
+                <input type="number" class="input-mini text-right" data-bind="value: settings.plugins.bedcooldown.time_elapsed" min="0">
+                <span class="add-on">s</span>
+            </div>
+            <span class="help-inline">{{ _('Print time elapsed (above)') }}</span>
+        </div>
+        <div class="controls">
+            <div class="input-append">
                 <input type="number" class="input-mini text-right" data-bind="value: settings.plugins.bedcooldown.time_left" min="0">
                 <span class="add-on">s</span>
             </div>
-            <span class="help-inline">{{ _('Print time left') }}</span>
+            <span class="help-inline">{{ _('Print time left (below)') }}</span>
         </div>
         <div class="controls">
             <div class="input-append">
                 <input type="number" class="input-mini text-right" data-bind="value: settings.plugins.bedcooldown.completion" min="0" max="100">
                 <span class="add-on">%</span>
             </div>
-            <span class="help-inline">{{ _('Print percentage complete') }}</span>
-            <span class="help-block">{{ _('Bed cooldown will be triggered when the print time left is below its threshold, and the print percentage complete is above its threshold.') }}</span>
+            <span class="help-inline">{{ _('Print percentage complete (above)') }}</span>
+            <span class="help-block">{{ _('Bed cooldown will be triggered when all above conditions are met.') }}</span>
         </div>
         <div class="controls">
         </div>
@@ -37,6 +44,17 @@
                 {{ _('Use GCODE for completion threshold') }}
                <span class="help-block">{{ _('If checked, the actual percentage of the print completed by GCODE will be used, instead of the default estimated percentage of the print completed by time.') }}</span>
             </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">{{ _('Cooldown') }}</label>
+        <div class="controls">
+            <div class="input-append">
+                <input type="number" class="input-mini text-right" data-bind="value: settings.plugins.bedcooldown.temperature" min="0">
+                <span class="add-on">&deg;C</span>
+            </div>
+            <span class="help-inline">{{ _('Bed target temperature') }}</span>
+            <span class="help-block">{{ _('When cooldown is triggered, set this bed temperature. 0&deg;C (default) will be treated as no heat.') }}</span>
         </div>
     </div>
 </form>

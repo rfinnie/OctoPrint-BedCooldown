@@ -5,8 +5,9 @@
 For filaments such as PLA, many printers have more than enough stored thermal mass in the bed to keep bed adhesion throughout the print.
 Therefore, you may want to turn off the bed heater automatically before the end of a print, saving cooldown time.
 
-The bed heater will be turned off during a print, when both conditions are met:
+The bed heater will be turned off during a print, when all conditions are met:
 
+  * The print time elapsed is above the configured threshold (default 0 seconds; i.e. do not consider)
   * The print time left is below the configured threshold (default 300 seconds / 5 minutes)
   * The print completion percentage is above the configured threshold (default 90%)
 
