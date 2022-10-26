@@ -152,6 +152,18 @@ class BedCooldown(
                 },
             )
 
+            # Extensible chart marking support added in OctoPrint 1.9.0
+            if hasattr(Events, "CHART_MARKED"):
+                # This marking is styled by bedcooldown.css and translatable via
+                # dummy requests in bedcooldown.js
+                self._event_bus.fire(
+                    Events.CHART_MARKED,
+                    {
+                        "type": "bedcooldown_cooldown",
+                        "label": "Cooldown",
+                    },
+                )
+
     # SettingsPlugin mixin
 
     def get_settings_defaults(self):
@@ -168,6 +180,14 @@ class BedCooldown(
 
     def get_template_configs(self):
         return [dict(type="settings", custom_bindings=False)]
+
+    # AssetPlugin mixin
+
+    def get_assets(self):
+        return dict(
+            js=["js/bedcooldown.js"],
+            css=["css/bedcooldown.css"],
+        )
 
     # Softwareupdate hook
 
