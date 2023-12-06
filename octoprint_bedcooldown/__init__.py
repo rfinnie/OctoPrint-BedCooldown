@@ -74,6 +74,7 @@ class BedCooldown(
                 self._bedcooldown_timer = None
 
     def _bedcooldown_timer_triggered(self):
+        self._logger.debug("Recurring trigger")
         settings = self._get_plugin_settings()
         if not settings.enabled:
             self._logger.debug("Plugin is not enabled")
@@ -85,11 +86,32 @@ class BedCooldown(
             )
             return
         current_data = self._printer.get_current_data()
-        time_elapsed = timedelta(seconds=current_data["progress"]["printTime"])
-        time_left = timedelta(seconds=current_data["progress"]["printTimeLeft"])
-        time_left_origin = current_data["progress"]["printTimeLeftOrigin"]
+        progress = current_data.get("progress", {})
+        progress_keys = (
+            "printTime",
+            "printTimeLeft",
+            "printTimeLeftOrigin",
+            "completion",
+        )
+        missing_keys = [k for k in progress_keys if k not in progress]
+        if missing_keys:
+            self._logger.debug(
+                "Missing progress keys, ignoring this round: {}".format(missing_keys)
+            )
+            return
+        missing_values = [k for k in progress_keys if progress[k] is None]
+        if missing_values:
+            self._logger.debug(
+                "Missing progress values, ignoring this round: {}".format(
+                    missing_values
+                )
+            )
+            return
+        time_elapsed = timedelta(seconds=progress["printTime"])
+        time_left = timedelta(seconds=progress["printTimeLeft"])
+        time_left_origin = progress["printTimeLeftOrigin"]
         completion_time = time_elapsed / (time_elapsed + time_left)
-        completion_gcode = current_data["progress"]["completion"] / 100.0
+        completion_gcode = progress["completion"] / 100.0
         if settings.completion_use_gcode:
             completion = completion_gcode
             completion_type = "gcode"
