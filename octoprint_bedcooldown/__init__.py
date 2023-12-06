@@ -18,7 +18,6 @@ class BedCooldown(
     octoprint.plugin.AssetPlugin,
     octoprint.plugin.TemplatePlugin,
 ):
-
     _bedcooldown_timer = None
 
     def _get_plugin_settings(self):
