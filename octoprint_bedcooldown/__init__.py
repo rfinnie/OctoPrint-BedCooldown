@@ -60,7 +60,7 @@ class BedCooldown(
 
             self._logger.debug("Scheduling RepeatedTimer for 30 seconds")
             self._bedcooldown_timer = octoprint.util.RepeatedTimer(
-                30, self._bedcooldown_timer_triggered
+                30, self._bedcooldown_timer_triggered_wrapper
             )
             self._bedcooldown_timer.start()
         elif event in (Events.PRINT_DONE, Events.PRINT_FAILED, Events.PRINT_CANCELLED):
@@ -72,6 +72,12 @@ class BedCooldown(
                 )
                 self._bedcooldown_timer.cancel()
                 self._bedcooldown_timer = None
+
+    def _bedcooldown_timer_triggered_wrapper(self):
+        try:
+            return self._bedcooldown_timer_triggered()
+        except Exception:
+            self._logger.exception("Uncaught exception in recurring trigger")
 
     def _bedcooldown_timer_triggered(self):
         self._logger.debug("Recurring trigger")
