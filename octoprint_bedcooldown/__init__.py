@@ -58,17 +58,11 @@ class BedCooldown(
                 self._logger.info("However, plugin is not currently enabled")
 
             self._logger.debug("Scheduling RepeatedTimer for 30 seconds")
-            self._bedcooldown_timer = octoprint.util.RepeatedTimer(
-                30, self._bedcooldown_timer_triggered_wrapper
-            )
+            self._bedcooldown_timer = octoprint.util.RepeatedTimer(30, self._bedcooldown_timer_triggered_wrapper)
             self._bedcooldown_timer.start()
         elif event in (Events.PRINT_DONE, Events.PRINT_FAILED, Events.PRINT_CANCELLED):
             if self._bedcooldown_timer is not None:
-                self._logger.debug(
-                    "Print ended via {event} event, cancelling timer".format(
-                        event=event
-                    )
-                )
+                self._logger.debug("Print ended via {event} event, cancelling timer".format(event=event))
                 self._bedcooldown_timer.cancel()
                 self._bedcooldown_timer = None
 
@@ -86,9 +80,7 @@ class BedCooldown(
             return
 
         if not self._printer.is_printing():
-            self._logger.warning(
-                "_bedcooldown_timer_triggered triggered but not printing? This shouldn't happen."
-            )
+            self._logger.warning("_bedcooldown_timer_triggered triggered but not printing? This shouldn't happen.")
             return
         current_data = self._printer.get_current_data()
         progress = current_data.get("progress", {})
@@ -100,17 +92,11 @@ class BedCooldown(
         )
         missing_keys = [k for k in progress_keys if k not in progress]
         if missing_keys:
-            self._logger.debug(
-                "Missing progress keys, ignoring this round: {}".format(missing_keys)
-            )
+            self._logger.debug("Missing progress keys, ignoring this round: {}".format(missing_keys))
             return
         missing_values = [k for k in progress_keys if progress[k] is None]
         if missing_values:
-            self._logger.debug(
-                "Missing progress values, ignoring this round: {}".format(
-                    missing_values
-                )
-            )
+            self._logger.debug("Missing progress values, ignoring this round: {}".format(missing_values))
             return
         time_elapsed = timedelta(seconds=progress["printTime"])
         time_left = timedelta(seconds=progress["printTimeLeft"])
@@ -144,11 +130,7 @@ class BedCooldown(
                 )
             )
         )
-        if (
-            (time_elapsed >= settings.time_elapsed)
-            and (time_left <= settings.time_left)
-            and (completion >= settings.completion)
-        ):
+        if (time_elapsed >= settings.time_elapsed) and (time_left <= settings.time_left) and (completion >= settings.completion):
             self._logger.info(
                 (
                     "Bed cooldown triggered (>= {settings_time_elapsed} elapsed, "
@@ -161,11 +143,7 @@ class BedCooldown(
                     settings_temperature=settings.temperature,
                 )
             )
-            self._printer.commands(
-                "M140 S{settings_temperature:.0f}".format(
-                    settings_temperature=settings.temperature
-                )
-            )
+            self._printer.commands("M140 S{settings_temperature:.0f}".format(settings_temperature=settings.temperature))
             self._bedcooldown_timer.cancel()
             self._bedcooldown_timer = None
 
