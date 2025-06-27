@@ -1,3 +1,19 @@
+[project]
+name = "OctoPrint-BedCooldown"
+version = "0.6.1"
+description = "Turns off the bed heater toward the end of a print"
+authors = [
+    { name = "Ryan Finnie", email = "ryan@finnie.org" },
+]
+requires-python = ">=3,<4"
+license = "MPL-2.0"
+
+[project.entry-points."octoprint.plugin"]
+bedcooldown = "octoprint_bedcooldown"
+
+[project.urls]
+Homepage = "https://github.com/rfinnie/OctoPrint-BedCooldown"
+
 [tool.black]
 line-length = 132
 
