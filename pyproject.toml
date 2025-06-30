@@ -1,6 +1,6 @@
 [project]
 name = "OctoPrint-BedCooldown"
-version = "0.6.2"
+version = "0.6.3"
 description = "Turns off the bed heater toward the end of a print"
 authors = [
     { name = "Ryan Finnie", email = "ryan@finnie.org" },
