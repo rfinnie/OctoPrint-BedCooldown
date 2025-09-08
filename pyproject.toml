@@ -7,9 +7,18 @@ authors = [
 ]
 requires-python = ">=3,<4"
 license = "MPL-2.0"
+dependencies = [
+    "OctoPrint",
+]
 
 [project.entry-points."octoprint.plugin"]
 bedcooldown = "octoprint_bedcooldown"
+
+[tool.setuptools.packages.find]
+include = [
+    "octoprint_bedcooldown",
+    "octoprint_bedcooldown.tests",
+]
 
 [project.urls]
 Homepage = "https://github.com/rfinnie/OctoPrint-BedCooldown"
