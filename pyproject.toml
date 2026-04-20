@@ -17,6 +17,10 @@ dependencies = [
     "OctoPrint",
 ]
 
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project.entry-points."octoprint.plugin"]
 bedcooldown = "octoprint_bedcooldown"
 
