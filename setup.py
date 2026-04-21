@@ -6,4 +6,5 @@
 
 import setuptools
 
-setuptools.setup()
+# setuptools<77 compatibility; dynamic=version in pyproject.toml
+setuptools.setup(license="MPL-2.0")
