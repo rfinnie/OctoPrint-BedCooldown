@@ -6,4 +6,5 @@
 recursive-include octoprint_bedcooldown/templates *
 recursive-include octoprint_bedcooldown/translations *
 recursive-include octoprint_bedcooldown/static *
+recursive-include LICENSES *
 include README.md
