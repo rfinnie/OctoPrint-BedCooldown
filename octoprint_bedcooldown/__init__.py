@@ -185,6 +185,10 @@ class BedCooldown(
 
     # TemplatePlugin mixin
 
+    # https://community.octoprint.org/t/how-do-i-improve-my-plugins-security-by-enabling-autoescape/61067
+    def is_template_autoescaped(self):
+        return True
+
     def get_template_configs(self):
         return [dict(type="settings", custom_bindings=False)]
 
