@@ -21,6 +21,9 @@ class BedCooldown(
     octoprint.plugin.TemplatePlugin,
 ):
     _bedcooldown_timer = None
+    _bedcooldown_timer_slow = 30
+    _bedcooldown_timer_fast = 3
+    _bedcooldown_home_stretch = False
 
     def _get_plugin_settings(self):
         return types.SimpleNamespace(
@@ -59,8 +62,10 @@ class BedCooldown(
             if not settings.enabled:
                 self._logger.info("However, plugin is not currently enabled")
 
-            self._logger.debug("Scheduling RepeatedTimer for 30 seconds")
-            self._bedcooldown_timer = octoprint.util.RepeatedTimer(30, self._bedcooldown_timer_triggered_wrapper)
+            self._logger.debug("Scheduling RepeatedTimer for {slow} seconds".format(slow=self._bedcooldown_timer_slow))
+            self._bedcooldown_timer = octoprint.util.RepeatedTimer(
+                self._bedcooldown_timer_slow, self._bedcooldown_timer_triggered_wrapper
+            )
             self._bedcooldown_timer.start()
         elif event in (Events.PRINT_DONE, Events.PRINT_FAILED, Events.PRINT_CANCELLED):
             if self._bedcooldown_timer is not None:
@@ -170,6 +175,21 @@ class BedCooldown(
                         "label": "Cooldown",
                     },
                 )
+
+        if (not self._bedcooldown_home_stretch) and (
+            time_left <= (settings.time_left + timedelta(seconds=(self._bedcooldown_timer_slow * 2)))
+        ):
+            self._logger.debug(
+                "Home stretch, increasing polling from {slow} to {fast} seconds".format(
+                    slow=self._bedcooldown_timer_slow, fast=self._bedcooldown_timer_fast
+                )
+            )
+            self._bedcooldown_home_stretch = True
+            self._bedcooldown_timer.cancel()
+            self._bedcooldown_timer = octoprint.util.RepeatedTimer(
+                self._bedcooldown_timer_fast, self._bedcooldown_timer_triggered_wrapper
+            )
+            self._bedcooldown_timer.start()
 
     # SettingsPlugin mixin
 
