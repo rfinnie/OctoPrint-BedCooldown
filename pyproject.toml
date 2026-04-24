@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: MPL-2.0
 [project]
 name = "OctoPrint-BedCooldown"
-version = "0.7.0"
+version = "0.8.0"
 description = "Turns off the bed heater toward the end of a print"
 authors = [
     { name = "Ryan Finnie", email = "ryan@finnie.org" },
