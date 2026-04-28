@@ -10,7 +10,8 @@ labels:
   platform: "linux/amd64"
 steps:
   - name: "tox"
-    image: "python:3.14-trixie"
+    # As of 2026-04-28, OctoPrint is not yet compatible with Python 3.14
+    image: "python:3.13-trixie"
     commands: |
       python -mpip install tox
       tox
