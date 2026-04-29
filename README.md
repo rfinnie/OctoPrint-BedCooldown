@@ -23,7 +23,7 @@ Be sure to monitor your print, as turning off the bed heater could cause the pri
 Install via the bundled [Plugin Manager](https://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html)
 or manually using this URL:
 
-    https://github.com/rfinnie/OctoPrint-BedCooldown/archive/main.zip
+    https://codeberg.org/rfinnie/OctoPrint-BedCooldown/archive/release.zip
 
 ## Configuration
 
@@ -42,7 +42,7 @@ This document is provided under the following license:
 
     SPDX-PackageName: Octoprint-BedCooldown
     SPDX-PackageSupplier: Ryan Finnie <ryan@finnie.org>
-    SPDX-PackageDownloadLocation: https://github.com/rfinnie/Octoprint-BedCooldown
+    SPDX-PackageDownloadLocation: https://codeberg.org/rfinnie/Octoprint-BedCooldown
     SPDX-FileComment: README
     SPDX-FileCopyrightText: SPDX-FileCopyrightText: © 2021 Ryan Finnie <ryan@finnie.org>
     SPDX-License-Identifier: CC-BY-SA-4.0
