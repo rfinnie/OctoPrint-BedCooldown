@@ -9,6 +9,9 @@ from __future__ import absolute_import
 from datetime import timedelta
 import types
 
+from packaging.version import Version
+import requests
+
 import octoprint.plugin
 import octoprint.util
 from octoprint.events import Events
@@ -230,13 +233,10 @@ class BedCooldown(
             "bedcooldown": {
                 "displayName": "Bed Cooldown",
                 "displayVersion": self._plugin_version,
-                # version check: github repository
-                "type": "github_release",
-                "user": "rfinnie",
-                "repo": "OctoPrint-BedCooldown",
+                "type": "python_checker",
+                "python_checker": BedCooldownVersionChecker(),
                 "current": self._plugin_version,
-                # update method: pip
-                "pip": "https://github.com/rfinnie/OctoPrint-BedCooldown/archive/{target_version}.zip",
+                "pip": "https://codeberg.org/rfinnie/OctoPrint-BedCooldown/archive/v{target_version}.zip",
             }
         }
 
@@ -244,6 +244,40 @@ class BedCooldown(
 
     def register_custom_events(self, *args, **kwargs):
         return ["cooldown_triggered"]
+
+
+class BedCooldownVersionChecker:
+    def get_latest(self, target, check, full_data=False, online=True):
+        if not online:
+            raise Exception("Cannot check while offline")
+        res = requests.get("https://codeberg.org/api/v1/repos/rfinnie/OctoPrint-BedCooldown/releases")
+        res.raise_for_status()
+        releases = res.json()
+
+        target_release = None
+        for release in releases:
+            if release.get("draft") or release.get("prerelease"):
+                continue
+            target_release = release
+            break
+        if target_release is None:
+            raise Exception("No suitable releases found")
+
+        release_version = target_release.get("tag_name").lstrip("v")
+        current_version = check.get("current")
+        information = {
+            "local": {
+                "name": current_version,
+                "value": current_version,
+            },
+            "remote": {
+                "name": release_version,
+                "value": release_version,
+                "release_notes": target_release.get("html_url"),
+            },
+        }
+        needs_update = Version(current_version) < Version(release_version)
+        return information, not needs_update
 
 
 __plugin_name__ = "Bed Cooldown"

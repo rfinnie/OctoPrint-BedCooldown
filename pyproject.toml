@@ -17,6 +17,8 @@ dynamic = [
 ]
 dependencies = [
     "OctoPrint",
+    "packaging",
+    "requests",
 ]
 
 [build-system]
