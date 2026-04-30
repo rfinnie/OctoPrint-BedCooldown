@@ -13,7 +13,7 @@ body:
       value: >-
         **Thank you for your bug report!**
 
-          * First, be sure you are running the [latest version of the Bed Cooldown plugin](https://codeberg.org/rfinnie/OctoPrint-BedCooldown/releases).
+          * First, be sure you are running the [latest version of the Bed Cooldown plugin](https://github.com/rfinnie/OctoPrint-BedCooldown/releases).
 
           * You will also need to [enable debugging on the plugin](https://docs.octoprint.org/en/master/configuration/logging_yaml.html).
             * This may be done through the *Settings* > *OctoPrint* > *Logging* > *Logging Levels* section.

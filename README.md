@@ -20,10 +20,12 @@ Be sure to monitor your print, as turning off the bed heater could cause the pri
 
 ## Setup
 
+**Note:** Due to technical limitations, as of April 2026, plugin distribution (plugin manager endpoints, install zip, etc) is still being done through GitHub. The rest of the project (development, issues, CI/CD, etc) are at Codeberg. In the future, if/when distribution moves off GitHub, a plugin update should handle this migration automatically, with no manual migration needed.
+
 Install via the bundled [Plugin Manager](https://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html)
 or manually using this URL:
 
-    https://codeberg.org/rfinnie/OctoPrint-BedCooldown/archive/release.zip
+    https://github.com/rfinnie/OctoPrint-BedCooldown/archive/release.zip
 
 ## Configuration
 
