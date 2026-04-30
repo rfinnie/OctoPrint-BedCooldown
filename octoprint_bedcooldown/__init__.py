@@ -9,9 +9,6 @@ from __future__ import absolute_import
 from datetime import timedelta
 import types
 
-from packaging.version import Version
-import requests
-
 import octoprint.plugin
 import octoprint.util
 from octoprint.events import Events
@@ -233,10 +230,13 @@ class BedCooldown(
             "bedcooldown": {
                 "displayName": "Bed Cooldown",
                 "displayVersion": self._plugin_version,
-                "type": "python_checker",
-                "python_checker": BedCooldownVersionChecker(self),
+                # version check: github repository
+                "type": "github_release",
+                "user": "rfinnie",
+                "repo": "OctoPrint-BedCooldown",
                 "current": self._plugin_version,
-                "pip": "https://codeberg.org/rfinnie/OctoPrint-BedCooldown/archive/v{target_version}.zip",
+                # update method: pip
+                "pip": "https://github.com/rfinnie/OctoPrint-BedCooldown/archive/{target_version}.zip",
             }
         }
 
@@ -244,60 +244,6 @@ class BedCooldown(
 
     def register_custom_events(self, *args, **kwargs):
         return ["cooldown_triggered"]
-
-
-class BedCooldownVersionChecker:
-    def __init__(self, plugin):
-        self._plugin = plugin
-        self._logger = plugin._logger
-
-    def get_latest(self, target, check, full_data=False, online=True):
-        current_version = check.get("current")
-        information = {
-            "local": {
-                "name": current_version,
-                "value": current_version,
-            },
-            "remote": {
-                "name": "?",
-                "value": "?",
-                "release_notes": None,
-            },
-            "needs_online": not check.get("offline", False),
-        }
-        if not online and information["needs_online"]:
-            self._logger.info("Not online, skipping check")
-            return information, True
-
-        try:
-            res = requests.get("https://codeberg.org/api/v1/repos/rfinnie/OctoPrint-BedCooldown/releases")
-            res.raise_for_status()
-            releases = res.json()
-        except Exception:
-            self._logger.exception("Received exception from remote check")
-            return information, True
-
-        target_release = None
-        for release in releases:
-            if release.get("draft") or release.get("prerelease"):
-                continue
-            target_release = release
-            break
-        if target_release is None:
-            self._logger.error("No suitable releases found")
-            return information, True
-
-        release_version = target_release.get("tag_name").lstrip("v")
-        information["remote"]["name"] = release_version
-        information["remote"]["value"] = release_version
-        information["remote"]["release_notes"] = target_release.get("html_url")
-        needs_update = Version(current_version) < Version(release_version)
-        self._logger.debug(
-            "Current is {current_version}, release is {release_version}, needs update is {needs_update}".format(
-                current_version=current_version, release_version=release_version, needs_update=needs_update
-            )
-        )
-        return information, not needs_update
 
 
 __plugin_name__ = "Bed Cooldown"
