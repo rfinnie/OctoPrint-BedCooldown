@@ -44,7 +44,7 @@ This document is provided under the following license:
 
     SPDX-PackageName: Octoprint-BedCooldown
     SPDX-PackageSupplier: Ryan Finnie <ryan@finnie.org>
-    SPDX-PackageDownloadLocation: https://codeberg.org/rfinnie/Octoprint-BedCooldown
+    SPDX-PackageDownloadLocation: https://forge.colobox.com/rfinnie/Octoprint-BedCooldown
     SPDX-FileComment: README
     SPDX-FileCopyrightText: SPDX-FileCopyrightText: © 2021 Ryan Finnie <ryan@finnie.org>
     SPDX-License-Identifier: CC-BY-SA-4.0
