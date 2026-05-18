@@ -9,9 +9,13 @@ from __future__ import absolute_import
 from datetime import timedelta
 import types
 
+from packaging.version import Version
+import requests
+
 import octoprint.plugin
 import octoprint.util
 from octoprint.events import Events
+from octoprint.util.version import is_octoprint_compatible
 
 
 class BedCooldown(
@@ -226,24 +230,91 @@ class BedCooldown(
         # Define the configuration for your plugin to use with the Software Update
         # Plugin here. See https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
         # for details.
-        return {
-            "bedcooldown": {
-                "displayName": "Bed Cooldown",
-                "displayVersion": self._plugin_version,
-                # version check: github repository
-                "type": "github_release",
-                "user": "rfinnie",
-                "repo": "OctoPrint-BedCooldown",
-                "current": self._plugin_version,
-                # update method: pip
-                "pip": "https://github.com/rfinnie/OctoPrint-BedCooldown/archive/{target_version}.zip",
-            }
+        update_info = {
+            "displayName": "Bed Cooldown",
+            "displayVersion": self._plugin_version,
+            "current": self._plugin_version,
+            "forge": "https://forge.colobox.com/api/v1",
+            "user": "rfinnie",
+            "repo": "OctoPrint-BedCooldown",
+            "pip": "https://forge.colobox.com/rfinnie/OctoPrint-BedCooldown/archive/{target_version}.zip",
         }
+        if is_octoprint_compatible(">=2.0.0rc2"):
+            update_info["type"] = "forgejo_release"
+        else:
+            update_info["type"] = "python_checker"
+            update_info["python_checker"] = ForgejoUpdateChecker()
+        return {"bedcooldown": update_info}
 
     # Events hook
 
     def register_custom_events(self, *args, **kwargs):
         return ["cooldown_triggered"]
+
+
+class ForgejoUpdateChecker:
+    # As of this writing (May 2026), OctoPrint 2.0.0 is in RC and will have native support for
+    # Forgejo, so this can be replaced sometime after 2.0.0's release.
+    def __init__(self):
+        self._logger = __plugin_implementation__._logger
+        self._logger.info(
+            "Update checker: Using plugin-provided ForgejoUpdateChecker. OctoPrint 2.0.0 will include native Forgejo support, "
+            + "and this plugin will automatically switch to it when detected."
+        )
+
+    def get_latest(self, target, check, full_data=False, online=True):
+        self._logger.debug("Update checker: Beginning update check")
+        current_version = check.get("current")
+        information = {
+            "local": {
+                "name": current_version,
+                "value": current_version,
+            },
+            "remote": {
+                "name": "?",
+                "value": "?",
+                "release_notes": None,
+            },
+            "needs_online": not check.get("offline", False),
+        }
+
+        if not online and information["needs_online"]:
+            self._logger.info("Update checker: Not online, skipping check")
+            return information, True
+
+        try:
+            res = requests.get(
+                "{url}/repos/{user}/{repo}/releases".format(url=check["forge"], user=check["user"], repo=check["repo"])
+            )
+            res.raise_for_status()
+            releases = res.json()
+        except Exception:
+            self._logger.exception("Update checker: Received exception from remote check")
+            return information, True
+
+        target_release = None
+        for release in releases:
+            if release.get("draft", False) or release.get("prerelease", False):
+                continue
+            target_release = release
+            break
+        if target_release is None:
+            self._logger.error("Update checker: No suitable releases found")
+            return information, True
+
+        release_version = target_release.get("name")
+        information["remote"]["name"] = release_version
+        information["remote"]["value"] = target_release.get("tag_name")
+        information["remote"]["release_notes"] = target_release.get("html_url")
+        is_current = Version(current_version) >= Version(release_version)
+        self._logger.debug(
+            "Update checker: Current is {current_version}, release is {release_version}, {is_current}".format(
+                current_version=current_version,
+                release_version=release_version,
+                is_current=("is current" if is_current else "needs update"),
+            )
+        )
+        return information, is_current
 
 
 __plugin_name__ = "Bed Cooldown"
