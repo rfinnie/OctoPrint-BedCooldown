@@ -32,7 +32,7 @@ It may be selectively disabled, and the time left and completion thresholds may 
 
 ## License
 
-Copyright (C) 2021-2022 [Ryan Finnie](https://www.finnie.org/)
+© 2021 [Ryan Finnie](https://www.finnie.org/)
 
 This Source Code Form is subject to the terms of the Mozilla Public License, v.
 2.0. If a copy of the MPL was not distributed with this file, You can obtain one
@@ -44,5 +44,5 @@ This document is provided under the following license:
     SPDX-PackageSupplier: Ryan Finnie <ryan@finnie.org>
     SPDX-PackageDownloadLocation: https://forge.colobox.com/rfinnie/Octoprint-BedCooldown
     SPDX-FileComment: README
-    SPDX-FileCopyrightText: SPDX-FileCopyrightText: © 2021 Ryan Finnie <ryan@finnie.org>
+    SPDX-FileCopyrightText: © 2021 Ryan Finnie <ryan@finnie.org>
     SPDX-License-Identifier: CC-BY-SA-4.0
