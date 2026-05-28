@@ -1,5 +1,8 @@
 # OctoPrint-BedCooldown
 
+[![Git forge repository](https://img.shields.io/badge/git-forge-orange?logo=forgejo)](https://forge.colobox.com/rfinnie/OctoPrint-BedCooldown)
+[![CI pipeline status](https://woodpecker.colobox.com/api/badges/49/status.svg)](https://woodpecker.colobox.com/repos/49)
+
 *Turns off the bed heater toward the end of a print*
 
 For filaments such as PLA, many printers have more than enough stored thermal mass in the bed to keep bed adhesion throughout the print.
