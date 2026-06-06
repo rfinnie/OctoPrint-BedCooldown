@@ -8,10 +8,13 @@ when:
   - event: ["push", "pull_request", "manual"]
 labels:
   platform: "linux/amd64"
+clone:
+  git:
+    image: "docker.io/woodpeckerci/plugin-git:latest@sha256:ebde4a4d07e0e24b630082484d192890dd4f6d442d90bf5466f0763860f83652"  # 2026-05-28
 steps:
   - name: "tox"
     # As of 2026-04-28, OctoPrint is not yet compatible with Python 3.14
-    image: "python:3.13-trixie"
+    image: "docker.io/library/python:3.13-trixie@sha256:7118935d83fb66a0c01091420ea8736bf66e9ee068018876f0c9b50026ce6d7b"  # 2026-05-25
     commands: |
       set -x
 
@@ -27,7 +30,7 @@ steps:
   - name: "Notify Mastodon if failure"
     when:
       - status: ["failure"]
-    image: "woodpeckerci/plugin-mastodon-post"
+    image: "docker.io/woodpeckerci/plugin-mastodon-post:latest@sha256:456597681cff794b6ddb7b085ce95c42a18301e512503898c4abdaa1080e7e4c"  # 2026-04-19
     settings:
       server_url: "https://m29.us"
       access_token:
